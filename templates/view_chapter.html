@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{{ chapter.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{{ url_for('view_subject', subject_id=chapter.subject_id) }}" class="btn btn-outline-primary mb-3">
+                <i class="fas fa-arrow-left"></i> Back to {{ chapter.subject.name }}
+            </a>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bookmark fa-3x text-primary me-4"></i>
+                        <div>
+                            <h2 class="mb-2">{{ chapter.name }}</h2>
+                            <p class="text-muted mb-1">{{ chapter.description }}</p>
+                            <span class="badge bg-info">{{ chapter.subject.name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-3">
+            <h4 class="fw-bold">
+                <i class="fas fa-clipboard-list"></i> Available Quizzes
+            </h4>
+        </div>
+        
+        {% for quiz in quizzes %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0">Quiz {{ loop.index }}</h5>
+                        <span class="badge bg-success">{{ quiz.questions|length }} Questions</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p class="mb-1">
+                            <i class="fas fa-calendar"></i> 
+                            <strong>Date:</strong> {{ quiz.date_of_quiz.strftime('%B %d, %Y') }}
+                        </p>
+                        <p class="mb-1">
+                            <i class="fas fa-clock"></i> 
+                            <strong>Duration:</strong> {{ quiz.time_duration }}
+                        </p>
+                        {% if quiz.remarks %}
+                        <p class="mb-0 text-muted">
+                            <i class="fas fa-info-circle"></i> {{ quiz.remarks }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    {% if quiz.questions|length > 0 %}
+                        <a href="{{ url_for('start_quiz', quiz_id=quiz.id) }}" 
+                           class="btn btn-primary w-100">
+                            <i class="fas fa-play"></i> Start Quiz
+                        </a>
+                    {% else %}
+                        <button class="btn btn-secondary w-100" disabled>
+                            <i class="fas fa-exclamation-circle"></i> No Questions Available
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> 
+                No quizzes available for this chapter yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Chapters{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-0">
+            <div class="p-3">
+                <h5 class="text-muted mb-3">ADMIN MENU</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_subjects') }}">
+                            <i class="fas fa-book"></i> Subjects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('manage_chapters') }}">
+                            <i class="fas fa-bookmark"></i> Chapters
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_quizzes') }}">
+                            <i class="fas fa-clipboard-list"></i> Quizzes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 content-wrapper">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">
+                    <i class="fas fa-bookmark"></i> Manage Chapters
+                </h2>
+                <a href="{{ url_for('add_chapter') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Chapter
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Chapter Name</th>
+                                    <th>Subject</th>
+                                    <th>Description</th>
+                                    <th>Quizzes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for chapter in chapters %}
+                                <tr>
+                                    <td>{{ chapter.id }}</td>
+                                    <td><strong>{{ chapter.name }}</strong></td>
+                                    <td><span class="badge bg-info">{{ chapter.subject.name }}</span></td>
+                                    <td>{{ chapter.description[:40] }}{% if chapter.description|length > 40 %}...{% endif %}</td>
+                                    <td><span class="badge bg-primary">{{ chapter.quizzes|length }}</span></td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('edit_chapter', id=chapter.id) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('delete_chapter', id=chapter.id) }}" 
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('Are you sure? This will delete all quizzes under this chapter!')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-5">
+                                        <i class="fas fa-bookmark fa-3x mb-3 d-block"></i>
+                                        No chapters found. Click "Add New Chapter" to create one.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

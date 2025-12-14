@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Result{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Result Card -->
+            <div class="card mb-4">
+                <div class="card-body text-center p-5">
+                    {% if score.accuracy_percentage >= 75 %}
+                        <i class="fas fa-trophy fa-5x text-warning mb-3"></i>
+                        <h2 class="text-success mb-3">Excellent Performance!</h2>
+                    {% elif score.accuracy_percentage >= 50 %}
+                        <i class="fas fa-star fa-5x text-primary mb-3"></i>
+                        <h2 class="text-primary mb-3">Good Job!</h2>
+                    {% else %}
+                        <i class="fas fa-thumbs-up fa-5x text-info mb-3"></i>
+                        <h2 class="text-info mb-3">Keep Practicing!</h2>
+                    {% endif %}
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <h3>{{ score.total_score }}</h3>
+                                <p><i class="fas fa-check-circle"></i> Score</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <h3>{{ score.quiz.questions|length }}</h3>
+                                <p><i class="fas fa-question-circle"></i> Total Questions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <h3>{{ score.accuracy_percentage|round(2) }}%</h3>
+                                <p><i class="fas fa-percent"></i> Accuracy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-info-circle"></i> Quiz Details
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <strong>Subject:</strong> {{ score.quiz.chapter.subject.name }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Chapter:</strong> {{ score.quiz.chapter.name }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Quiz Date:</strong> {{ score.quiz.date_of_quiz.strftime('%Y-%m-%d') }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <strong>Attempted On:</strong> {{ score.timestamp_of_attempt.strftime('%Y-%m-%d %H:%M') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Analysis -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-chart-line"></i> Performance Analysis
+                    </h5>
+                    <div class="progress mb-3" style="height: 30px;">
+                        <div class="progress-bar 
+                            {% if score.accuracy_percentage >= 75 %}bg-success
+                            {% elif score.accuracy_percentage >= 50 %}bg-warning
+                            {% else %}bg-danger{% endif %}"
+                            role="progressbar" 
+                            style="width: {{ score.accuracy_percentage }}%"
+                            aria-valuenow="{{ score.accuracy_percentage }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100">
+                            {{ score.accuracy_percentage|round(2) }}%
+                        </div>
+                    </div>
+                    
+                    <div class="alert 
+                        {% if score.accuracy_percentage >= 75 %}alert-success
+                        {% elif score.accuracy_percentage >= 50 %}alert-warning
+                        {% else %}alert-info{% endif %}">
+                        <strong>Feedback:</strong>
+                        {% if score.accuracy_percentage >= 75 %}
+                            Outstanding! You have a strong grasp of this topic. Keep up the excellent work!
+                        {% elif score.accuracy_percentage >= 50 %}
+                            Good effort! You're on the right track. Review the material and practice more to improve.
+                        {% else %}
+                            Don't give up! This topic needs more practice. Review the chapter and try again.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <a href="{{ url_for('view_chapter', chapter_id=score.quiz.chapter_id) }}" 
+                       class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-redo"></i> Take Another Quiz
+                    </a>
+                    <a href="{{ url_for('performance_analysis') }}" 
+                       class="btn btn-success btn-lg me-2">
+                        <i class="fas fa-chart-bar"></i> View Performance
+                    </a>
+                    <a href="{{ url_for('user_dashboard') }}" 
+                       class="btn btn-secondary btn-lg">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

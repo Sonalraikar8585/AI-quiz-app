@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Performance Analysis{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-0">
+            <div class="p-3">
+                <h5 class="text-muted mb-3">MENU</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user_dashboard') }}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('performance_analysis') }}">
+                            <i class="fas fa-chart-bar"></i> Performance
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 content-wrapper">
+            <h2 class="fw-bold mb-4">
+                <i class="fas fa-chart-line"></i> Performance Analysis
+            </h2>
+
+            <!-- Overall Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <h3>{{ performance_data.overall_accuracy }}%</h3>
+                        <p><i class="fas fa-percentage"></i> Overall Accuracy</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <h3>{{ performance_data.total_quizzes }}</h3>
+                        <p><i class="fas fa-clipboard-list"></i> Quizzes Attempted</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <h3>{{ performance_data.total_score }}</h3>
+                        <p><i class="fas fa-star"></i> Total Score</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <h3>{{ performance_data.subject_performance|length }}</h3>
+                        <p><i class="fas fa-book"></i> Subjects</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <!-- Accuracy Trend Chart -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-chart-line"></i> Accuracy Trend Over Time
+                            </h5>
+                            <canvas id="accuracyTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subject Performance Chart -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-chart-bar"></i> Subject-wise Performance
+                            </h5>
+                            <canvas id="subjectPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strengths and Weaknesses -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-trophy text-success"></i> Your Strengths
+                            </h5>
+                            {% if performance_data.strengths %}
+                                <ul class="list-group">
+                                    {% for strength in performance_data.strengths %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ strength.chapter }}
+                                        <span class="badge bg-success">{{ strength.average_accuracy }}%</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted">Take more quizzes to identify your strengths!</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-exclamation-triangle text-warning"></i> Areas to Improve
+                            </h5>
+                            {% if performance_data.weaknesses %}
+                                <ul class="list-group">
+                                    {% for weakness in performance_data.weaknesses %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ weakness.chapter }}
+                                        <span class="badge bg-warning">{{ weakness.average_accuracy }}%</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted">Great! No weak areas identified yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Attempts Table -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-history"></i> Recent Quiz Attempts
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Chapter</th>
+                                            <th>Date</th>
+                                            <th>Score</th>
+                                            <th>Accuracy</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for attempt in performance_data.recent_attempts %}
+                                        <tr>
+                                            <td>{{ attempt.subject }}</td>
+                                            <td>{{ attempt.chapter }}</td>
+                                            <td>{{ attempt.date }}</td>
+                                            <td><strong>{{ attempt.score }}</strong></td>
+                                            <td>
+                                                <span class="badge badge-custom
+                                                    {% if attempt.accuracy >= 75 %}bg-success
+                                                    {% elif attempt.accuracy >= 50 %}bg-warning
+                                                    {% else %}bg-danger{% endif %}">
+                                                    {{ attempt.accuracy }}%
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Accuracy Trend Chart
+const accuracyCtx = document.getElementById('accuracyTrendChart').getContext('2d');
+const accuracyData = {{ performance_data.accuracy_trend|tojson }};
+
+new Chart(accuracyCtx, {
+    type: 'line',
+    data: {
+        labels: accuracyData.map(d => d.date),
+        datasets: [{
+            label: 'Accuracy %',
+            data: accuracyData.map(d => d.accuracy),
+            borderColor: 'rgb(67, 97, 238)',
+            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    }
+});
+
+// Subject Performance Chart
+const subjectCtx = document.getElementById('subjectPerformanceChart').getContext('2d');
+const subjectData = {{ performance_data.subject_performance|tojson }};
+
+new Chart(subjectCtx, {
+    type: 'bar',
+    data: {
+        labels: subjectData.map(d => d.subject),
+        datasets: [{
+            label: 'Average Accuracy %',
+            data: subjectData.map(d => d.average_accuracy),
+            backgroundColor: [
+                'rgba(67, 97, 238, 0.8)',
+                'rgba(239, 71, 111, 0.8)',
+                'rgba(6, 214, 160, 0.8)',
+                'rgba(255, 209, 102, 0.8)',
+                'rgba(118, 75, 162, 0.8)'
+            ],
+            borderColor: [
+                'rgb(67, 97, 238)',
+                'rgb(239, 71, 111)',
+                'rgb(6, 214, 160)',
+                'rgb(255, 209, 102)',
+                'rgb(118, 75, 162)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

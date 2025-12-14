@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Add Subject{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">
+                        <i class="fas fa-plus-circle"></i> Add New Subject
+                    </h3>
+                    
+                    <form method="POST" action="{{ url_for('add_subject') }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Subject Name *</label>
+                            <input type="text" class="form-control form-control-lg" 
+                                   id="name" name="name" required
+                                   placeholder="e.g., Python Programming, Data Structures">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Description *</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="4" required
+                                      placeholder="Enter a detailed description of the subject..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Subject
+                            </button>
+                            <a href="{{ url_for('manage_subjects') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

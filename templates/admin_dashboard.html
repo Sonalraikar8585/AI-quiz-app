@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-0">
+            <div class="p-3">
+                <h5 class="text-muted mb-3">ADMIN MENU</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_subjects') }}">
+                            <i class="fas fa-book"></i> Subjects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_chapters') }}">
+                            <i class="fas fa-bookmark"></i> Chapters
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_quizzes') }}">
+                            <i class="fas fa-clipboard-list"></i> Quizzes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 content-wrapper">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">
+                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                </h2>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="card-body">
+                            <h3>{{ users|length }}</h3>
+                            <p><i class="fas fa-users"></i> Total Users</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="card-body">
+                            <h3>{{ subjects|length }}</h3>
+                            <p><i class="fas fa-book"></i> Total Subjects</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="card-body">
+                            <h3>{{ quizzes|length }}</h3>
+                            <p><i class="fas fa-clipboard-list"></i> Total Quizzes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <div class="card-body">
+                            <h3>{{ total_attempts }}</h3>
+                            <p><i class="fas fa-chart-line"></i> Quiz Attempts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-bolt"></i> Quick Actions
+                            </h5>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="{{ url_for('add_subject') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Add Subject
+                                </a>
+                                <a href="{{ url_for('add_chapter') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Add Chapter
+                                </a>
+                                <a href="{{ url_for('add_quiz') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Create Quiz
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-users"></i> Registered Users
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Qualification</th>
+                                            <th>Registered On</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                        <tr>
+                                            <td>{{ user.id }}</td>
+                                            <td>{{ user.full_name }}</td>
+                                            <td>{{ user.username }}</td>
+                                            <td>{{ user.qualification or 'N/A' }}</td>
+                                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">
+                                                No users registered yet
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subjects Overview -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-book"></i> Subjects Overview
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Subject Name</th>
+                                            <th>Chapters</th>
+                                            <th>Quizzes</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for subject in subjects %}
+                                        <tr>
+                                            <td><strong>{{ subject.name }}</strong></td>
+                                            <td>{{ subject.chapters|length }}</td>
+                                            <td>
+                                                {% set quiz_count = namespace(value=0) %}
+                                                {% for chapter in subject.chapters %}
+                                                    {% set quiz_count.value = quiz_count.value + chapter.quizzes|length %}
+                                                {% endfor %}
+                                                {{ quiz_count.value }}
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('edit_subject', id=subject.id) }}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">
+                                                No subjects created yet
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
